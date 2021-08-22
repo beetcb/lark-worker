@@ -60,10 +60,11 @@ async function msgHandler(body: any) {
     }
 
     const accessToken = await getTenantAccessToken()
-    if (accessToken === '') {
-      console.warn(`verification token not match, token = %s`, accessToken)
+    if (!accessToken) {
+      console.warn(`Invalid verification token`, accessToken)
       return send()
     }
+
     const mentions = body.event.message.mentions
     let { text } = JSON.parse(body.event.message.content)
 
@@ -77,13 +78,7 @@ async function msgHandler(body: any) {
 
     await sendTextMessage(accessToken, {
       receiver: body.event.message.chat_id,
-      text: await tweeAddRecord(accessToken, {
-        fields: {
-          推文任务描述: 'test',
-          落实组别: '信息化办公室',
-          预计截止日期: new Date().getTime() + 1000 * 60 * 60 * 6,
-        },
-      }),
+      text: await tweeAddRecord(accessToken, text),
     })
     return send()
   }
