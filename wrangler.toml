@@ -1,0 +1,9 @@
+name = "lark-worker"
+type = "javascript"
+account_id = "a1e44a02bc09902ebeafca00dc98996f"
+workers_dev = true
+
+[build]
+command = "npm install && npm run build"
+[build.upload]
+format = "service-worker"
