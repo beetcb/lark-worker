@@ -2,6 +2,9 @@ name = "lark-worker"
 type = "javascript"
 account_id = "a1e44a02bc09902ebeafca00dc98996f"
 workers_dev = true
+kv_namespaces = [ 
+  { binding = "LARK", id = "fe909ecf33dd4b9ca6f3a48f2e7f6fc5" }
+]
 
 [build]
 command = "npm install && npm run build"
