@@ -1,4 +1,4 @@
-import { isMessageReceive, isVerification, send } from './utils'
+import { isMessageReceive, isVerification, sendRes } from './utils'
 import { sendTextMessage } from './api/message/sendMessage'
 import { tweeAddRecord } from './needs/twee'
 
@@ -21,7 +21,7 @@ export async function handleRequest(
       )
     }
 
-    return send()
+    return sendRes()
   }
 
   const body = await request.json()
@@ -32,23 +32,24 @@ export async function handleRequest(
     // @ts-ignore
     if (body.token !== APP_VERIFICATION_TOKEN) {
       console.warn(`verification token not match, token = %s`, body.token)
-      return send()
+      return sendRes()
     }
-    return send({ challenge: body.challenge })
+    return sendRes({ challenge: body.challenge })
   }
+  
+  console.warn('Req Coming', JSON.stringify(body, null, '  '))
 
   // 避免响应超过飞书 1s 限制
   e.waitUntil(msgHandler(body))
-  console.warn('Req Coming', JSON.stringify(body, null, '  '))
 
-  return send()
+  return sendRes()
 }
 
 async function msgHandler(body: any) {
   if (isMessageReceive(body)) {
     // 此处只处理 text 类型消息，其他类型消息忽略
     if (body.event.message.message_type !== 'text') {
-      return send()
+      return sendRes()
     }
 
     // 在群聊中，只有被@了才回复
@@ -56,13 +57,13 @@ async function msgHandler(body: any) {
       body.event.message.chat_type === 'group' &&
       !body.event.message.mentions?.length
     ) {
-      return send()
+      return sendRes()
     }
 
     const accessToken = await getTenantAccessToken()
     if (!accessToken) {
       console.warn(`Invalid verification token`, accessToken)
-      return send()
+      return sendRes()
     }
 
     const mentions = body.event.message.mentions
@@ -80,8 +81,8 @@ async function msgHandler(body: any) {
       receiver: body.event.message.chat_id,
       text: await tweeAddRecord(accessToken, text),
     })
-    return send()
+    return sendRes()
   }
 
-  return send()
+  return sendRes()
 }

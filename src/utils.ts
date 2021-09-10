@@ -12,7 +12,7 @@ export function isMessageReceive(body: any): body is ImMessageReceiveV1Event {
   return body?.header?.event_type === 'im.message.receive_v1'
 }
 
-export function send(body = {}) {
+export function sendRes(body = {}) {
   return new Response(JSON.stringify(body), {
     headers: {
       'content-type': 'application/json; charset=UTF-8',
