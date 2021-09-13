@@ -36,7 +36,7 @@ export async function handleRequest(
     }
     return sendRes({ challenge: body.challenge })
   }
-  
+
   console.warn('Req Coming', JSON.stringify(body, null, '  '))
 
   // 避免响应超过飞书 1s 限制
@@ -68,18 +68,25 @@ async function msgHandler(body: any) {
 
     const mentions = body.event.message.mentions
     let { text } = JSON.parse(body.event.message.content)
+    let departmentUserId = body.event.sender.sender_id.open_id as any
 
     if (mentions != null) {
       text = text.replace(/@_user_\d/g, (key: string) => {
         const user = mentions.find((x) => x.key === key)
-        if (user === undefined) return key
+        if (user === undefined) {
+          return key
+        }
+        departmentUserId = user.id.open_id
         return `<at user_id="${user.id.open_id}">${user.name}</at>`
       })
     }
 
     await sendTextMessage(accessToken, {
       receiver: body.event.message.chat_id,
-      text: await tweeAddRecord(accessToken, text),
+      text: await tweeAddRecord(accessToken, {
+        text: text as string,
+        departmentUserId,
+      }),
     })
     return sendRes()
   }
